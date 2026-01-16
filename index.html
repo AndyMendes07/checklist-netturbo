@@ -19,6 +19,8 @@
             margin: 0;
             padding: 20px;
             color: var(--dark);
+            -webkit-print-color-adjust: exact; /* Garante cores na impressão */
+            print-color-adjust: exact;
         }
 
         .container {
@@ -52,7 +54,6 @@
             flex-direction: column;
         }
 
-        /* Estilizando tanto Texto quanto Data */
         input[type="text"], 
         input[type="date"] {
             padding: 10px;
@@ -61,8 +62,9 @@
             font-size: 14px;
             width: 100%;
             box-sizing: border-box;
-            font-family: inherit; /* Mantém a mesma fonte */
+            font-family: inherit;
             color: var(--dark);
+            background: transparent;
         }
 
         /* Barra de Progresso */
@@ -96,6 +98,7 @@
             border: 1px solid #eee;
             border-radius: 6px;
             overflow: hidden;
+            page-break-inside: avoid; /* Evita quebra no meio da fase na impressão */
         }
 
         .phase-header {
@@ -141,7 +144,6 @@
             background-color: #fafafa;
         }
 
-        /* Checkbox Customizado */
         .task-label {
             display: flex;
             align-items: center;
@@ -164,7 +166,6 @@
             font-size: 14px;
         }
 
-        /* Estilo quando marcado */
         .task-checkbox:checked + .task-text {
             text-decoration: line-through;
             color: #999;
@@ -176,6 +177,9 @@
             text-align: right;
             border-top: 1px solid #eee;
             padding-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
         }
 
         .btn {
@@ -185,6 +189,10 @@
             cursor: pointer;
             font-weight: bold;
             transition: opacity 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
         }
 
         .btn-reset {
@@ -192,10 +200,61 @@
             color: white;
         }
 
+        .btn-print {
+            background-color: var(--dark);
+            color: white;
+        }
+
         .btn:hover {
             opacity: 0.9;
         }
 
+        /* === CONFIGURAÇÃO DE IMPRESSÃO (O SEGREDO DO PDF) === */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            /* Esconde elementos que não devem sair no PDF */
+            .actions, .progress-container {
+                display: none !important;
+            }
+            /* Remove bordas dos inputs para parecer texto corrido */
+            input[type="text"], input[type="date"] {
+                border: none;
+                padding: 5px 0;
+                font-weight: bold;
+                font-size: 16px;
+            }
+            /* Esconde o ícone de calendário na impressão */
+            input[type="date"]::-webkit-calendar-picker-indicator {
+                display: none;
+            }
+            /* Ajuste de layout para caber melhor na folha */
+            .phase {
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+            }
+            .task-item {
+                border-bottom: 1px solid #ccc;
+            }
+            .phase-header {
+                background-color: #ddd !important; /* Cinza claro para economizar tinta */
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+            }
+            .phase-num {
+                background-color: #B2D235 !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -285,7 +344,8 @@
     </form>
 
     <div class="actions">
-        <button class="btn btn-reset" onclick="resetChecklist()">🗑️ Limpar e Iniciar Novo Processo</button>
+        <button class="btn btn-print" onclick="window.print()">🖨️ Salvar em PDF</button>
+        <button class="btn btn-reset" onclick="resetChecklist()">🗑️ Limpar</button>
     </div>
 </div>
 
@@ -294,7 +354,7 @@
     const checkboxes = document.querySelectorAll('.task-checkbox');
     const progressBar = document.getElementById('progressBar');
     const vagaInput = document.getElementById('vagaInput');
-    const dataInput = document.getElementById('dataInput'); // Mudança aqui
+    const dataInput = document.getElementById('dataInput');
 
     // Carregar dados salvos ao abrir
     window.addEventListener('load', () => {
@@ -311,7 +371,7 @@
     });
 
     vagaInput.addEventListener('input', saveData);
-    dataInput.addEventListener('input', saveData); // Listener na data
+    dataInput.addEventListener('input', saveData);
 
     function updateProgress() {
         const total = checkboxes.length;
@@ -336,9 +396,8 @@
             checkboxStates[box.id] = box.checked;
         });
         localStorage.setItem('netTurbo_checkboxes', JSON.stringify(checkboxStates));
-
         localStorage.setItem('netTurbo_vaga', vagaInput.value);
-        localStorage.setItem('netTurbo_data', dataInput.value); // Salva a data
+        localStorage.setItem('netTurbo_data', dataInput.value);
     }
 
     function loadData() {
@@ -350,9 +409,8 @@
                 }
             });
         }
-
         const savedVaga = localStorage.getItem('netTurbo_vaga');
-        const savedData = localStorage.getItem('netTurbo_data'); // Carrega a data
+        const savedData = localStorage.getItem('netTurbo_data');
         
         if (savedVaga) vagaInput.value = savedVaga;
         if (savedData) dataInput.value = savedData;
