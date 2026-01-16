@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Net Turbo - Gestão de Processo Seletivo</title>
+    <style>
+        :root {
+            --primary: #B2D235; /* Verde Net Turbo */
+            --dark: #4a4a4a;
+            --light: #f4f4f4;
+            --white: #ffffff;
+            --success: #28a745;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--light);
+            margin: 0;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--primary);
+        }
+
+        /* Header e Inputs */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo img {
+            height: 60px;
+        }
+
+        .info-inputs {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+
+        /* Estilizando tanto Texto quanto Data */
+        input[type="text"], 
+        input[type="date"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: inherit; /* Mantém a mesma fonte */
+            color: var(--dark);
+        }
+
+        /* Barra de Progresso */
+        .progress-container {
+            background-color: #eee;
+            border-radius: 20px;
+            height: 20px;
+            width: 100%;
+            margin-bottom: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            background-color: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        /* Fases */
+        .phase {
+            margin-bottom: 20px;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .phase-header {
+            background-color: var(--dark);
+            color: white;
+            padding: 10px 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .phase-num {
+            background: var(--primary);
+            color: var(--dark);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Lista de Itens */
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .task-item {
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item:hover {
+            background-color: #fafafa;
+        }
+
+        /* Checkbox Customizado */
+        .task-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .task-checkbox {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        /* Estilo quando marcado */
+        .task-checkbox:checked + .task-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        /* Botões de Ação */
+        .actions {
+            margin-top: 30px;
+            text-align: right;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo">
+            <img src="1.jpg" alt="Net Turbo">
+        </div>
+        <div class="info-inputs">
+            <input type="text" id="vagaInput" placeholder="Nome da Vaga (Ex: SDR Júnior)">
+            <input type="date" id="dataInput">
+        </div>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar">0%</div>
+    </div>
+
+    <form id="checklistForm">
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">1</span> Abertura e Alinhamento</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t1_1"><span class="task-text">Receber abertura via Turbo Desk (Liderança)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t1_2"><span class="task-text">Validar info e Aprovar no Turbo Desk</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t1_3"><span class="task-text">Agendar alinhamento de perfil com Gestor</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t1_4"><span class="task-text">Criar arte da vaga no Canva</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t1_5"><span class="task-text">Formalizar alinhamento por e-mail</span></label></li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">2</span> Atração e Triagem</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t2_1"><span class="task-text">Publicar vaga na Solides</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t2_2"><span class="task-text">Publicar vaga no LinkedIn</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t2_3"><span class="task-text">Cadastrar vaga no ClickUp</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t2_4"><span class="task-text">Triagem de currículos aderentes</span></label></li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">3</span> Avaliação e Testes</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_1"><span class="task-text">Entrevista de triagem com RH</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_2"><span class="task-text">Aplicar testes Solides (Comp./Lógica)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_3"><span class="task-text">Devolutiva negativa (Reprovados Triagem)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_4"><span class="task-text">Realizar pesquisa criminal (Aptos)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_5"><span class="task-text">Agendar entrevista com Liderança</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_6"><span class="task-text">Aplicar teste grafológico</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_7"><span class="task-text">Case p/ Diretoria (se Coordenação)</span></label></li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">4</span> Proposta e Fechamento</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t4_1"><span class="task-text">Receber retorno da Liderança</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t4_2"><span class="task-text">Devolutiva negativa final</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t4_3"><span class="task-text"><strong>CLT:</strong> Enviar Carta Proposta</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t4_4"><span class="task-text"><strong>PJ:</strong> Apresentação proposta (Vídeo)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t4_5"><span class="task-text">Receber aceite formal do candidato</span></label></li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">5</span> Admissão e Onboarding</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_1"><span class="task-text">Solicitar documentação admissional</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_2"><span class="task-text">Enviar documentos para o DP</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_3"><span class="task-text"><strong>PJ:</strong> Enviar MEI p/ Fiscal e Contrato p/ DP</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_4"><span class="task-text"><strong>CLT:</strong> Agendar exame admissional (SOC)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_5"><span class="task-text">E-mail Onboarding (Liderança, T&D, MKT, DP)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_6"><span class="task-text">Chamado Turbo Desk (Endomkt - Kit/Café)</span></label></li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">6</span> Encerramento</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t6_1"><span class="task-text">Encerrar vaga na Solides</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t6_2"><span class="task-text">Finalizar tarefa no ClickUp</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t6_3"><span class="task-text">Finalizar chamado no Turbo Desk</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t6_4"><span class="task-text">Inserir na Planilha de Vagas (SLA)</span></label></li>
+            </ul>
+        </div>
+    </form>
+
+    <div class="actions">
+        <button class="btn btn-reset" onclick="resetChecklist()">🗑️ Limpar e Iniciar Novo Processo</button>
+    </div>
+</div>
+
+<script>
+    // Seleciona todos os inputs
+    const checkboxes = document.querySelectorAll('.task-checkbox');
+    const progressBar = document.getElementById('progressBar');
+    const vagaInput = document.getElementById('vagaInput');
+    const dataInput = document.getElementById('dataInput'); // Mudança aqui
+
+    // Carregar dados salvos ao abrir
+    window.addEventListener('load', () => {
+        loadData();
+        updateProgress();
+    });
+
+    // Salvar dados a cada mudança
+    checkboxes.forEach(box => {
+        box.addEventListener('change', () => {
+            saveData();
+            updateProgress();
+        });
+    });
+
+    vagaInput.addEventListener('input', saveData);
+    dataInput.addEventListener('input', saveData); // Listener na data
+
+    function updateProgress() {
+        const total = checkboxes.length;
+        const checked = document.querySelectorAll('.task-checkbox:checked').length;
+        const percent = Math.round((checked / total) * 100);
+        
+        progressBar.style.width = percent + '%';
+        progressBar.textContent = percent + '% Concluído';
+        
+        if(percent === 100) {
+            progressBar.style.backgroundColor = '#28a745';
+            progressBar.style.color = 'white';
+        } else {
+            progressBar.style.backgroundColor = '#B2D235';
+            progressBar.style.color = '#4a4a4a';
+        }
+    }
+
+    function saveData() {
+        const checkboxStates = {};
+        checkboxes.forEach(box => {
+            checkboxStates[box.id] = box.checked;
+        });
+        localStorage.setItem('netTurbo_checkboxes', JSON.stringify(checkboxStates));
+
+        localStorage.setItem('netTurbo_vaga', vagaInput.value);
+        localStorage.setItem('netTurbo_data', dataInput.value); // Salva a data
+    }
+
+    function loadData() {
+        const savedStates = JSON.parse(localStorage.getItem('netTurbo_checkboxes'));
+        if (savedStates) {
+            checkboxes.forEach(box => {
+                if (savedStates[box.id]) {
+                    box.checked = true;
+                }
+            });
+        }
+
+        const savedVaga = localStorage.getItem('netTurbo_vaga');
+        const savedData = localStorage.getItem('netTurbo_data'); // Carrega a data
+        
+        if (savedVaga) vagaInput.value = savedVaga;
+        if (savedData) dataInput.value = savedData;
+    }
+
+    function resetChecklist() {
+        if(confirm("Tem certeza que deseja limpar tudo para iniciar um novo processo?")) {
+            localStorage.removeItem('netTurbo_checkboxes');
+            localStorage.removeItem('netTurbo_vaga');
+            localStorage.removeItem('netTurbo_data');
+            location.reload(); 
+        }
+    }
+</script>
+
+</body>
+</html>
