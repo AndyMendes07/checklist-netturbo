@@ -3,246 +3,482 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checklist R&S - Net Turbo</title>
+    <title>Net Turbo - Gestão de Processo Seletivo</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 20px;
+        :root {
+            --primary: #B2D235; /* Verde Net Turbo */
+            --dark: #4a4a4a;
+            --light: #f4f4f4;
+            --white: #ffffff;
+            --success: #28a745;
         }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--light);
+            margin: 0;
+            padding: 20px;
+            color: var(--dark);
+            -webkit-print-color-adjust: exact; /* Garante cores na impressão */
+            print-color-adjust: exact;
+        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: #fff;
-            padding: 20px;
+            background: var(--white);
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--primary);
         }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .header-fields {
-            margin-bottom: 20px;
-            padding: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
+
+        /* Header e Inputs */
+        header {
             display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
             gap: 20px;
         }
-        .field-group {
-            display: flex;
-            flex-direction: column;
+
+        .logo img {
+            height: 60px;
+        }
+
+        .info-inputs {
             flex: 1;
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
         }
-        .field-group label {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .field-group input {
-            padding: 8px;
+
+        input[type="text"], 
+        input[type="date"] {
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: inherit;
+            color: var(--dark);
+            background: transparent;
         }
-        h2 {
-            color: #0056b3;
-            border-bottom: 2px solid #0056b3;
-            padding-bottom: 5px;
-            margin-top: 30px;
+
+        /* Barra de Progresso */
+        .progress-container {
+            background-color: #eee;
+            border-radius: 20px;
+            height: 20px;
+            width: 100%;
+            margin-bottom: 30px;
+            overflow: hidden;
+            position: relative;
         }
-        .item {
-            margin: 10px 0;
+
+        .progress-bar {
+            background-color: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        /* Fases */
+        .phase {
+            margin-bottom: 20px;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            overflow: hidden;
+            page-break-inside: avoid; /* Evita quebra no meio da fase na impressão */
+        }
+
+        .phase-header {
+            background-color: var(--dark);
+            color: white;
+            padding: 10px 15px;
+            font-weight: 600;
             display: flex;
             align-items: center;
         }
-        .item input[type="checkbox"] {
+
+        .phase-num {
+            background: var(--primary);
+            color: var(--dark);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-right: 10px;
-            transform: scale(1.2);
-            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
         }
-        .item label {
-            cursor: pointer;
-            font-size: 16px;
+
+        /* Lista de Itens */
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
-        /* Estilo para item riscado quando marcado */
-        .item input:checked + label {
+
+        .task-item {
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item:hover {
+            background-color: #fafafa;
+        }
+
+        .task-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .task-checkbox {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .task-checkbox:checked + .task-text {
             text-decoration: line-through;
-            color: #888;
+            color: #999;
         }
-        
-        /* Classes novas APENAS para a lógica do item 5 */
+
+        /* CLASSE NOVA PARA A LÓGICA (Ocultar itens) */
         .hidden {
             display: none !important;
         }
-        .indent-option {
-            margin-left: 25px;
-            padding: 5px;
-            background-color: #f9f9f9;
-            border-left: 3px solid #0056b3;
+
+        /* Botões de Ação */
+        .actions {
+            margin-top: 30px;
+            text-align: right;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
         }
-        
-        .btn-container {
-            text-align: center;
-            margin-top: 40px;
-        }
-        button {
+
+        .btn {
             padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #0056b3;
-            color: white;
             border: none;
-            border-radius: 5px;
-            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
         }
-        button:hover {
-            background-color: #004494;
+
+        .btn-reset {
+            background-color: #ff4d4d;
+            color: white;
         }
-        button.clear-btn {
-            background-color: #dc3545;
+
+        .btn-print {
+            background-color: var(--dark);
+            color: white;
         }
-        button.clear-btn:hover {
-            background-color: #c82333;
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* === CONFIGURAÇÃO DE IMPRESSÃO (O SEGREDO DO PDF) === */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            /* Esconde elementos que não devem sair no PDF */
+            .actions, .progress-container {
+                display: none !important;
+            }
+            /* Remove bordas dos inputs para parecer texto corrido */
+            input[type="text"], input[type="date"] {
+                border: none;
+                padding: 5px 0;
+                font-weight: bold;
+                font-size: 16px;
+            }
+            /* Esconde o ícone de calendário na impressão */
+            input[type="date"]::-webkit-calendar-picker-indicator {
+                display: none;
+            }
+            /* Ajuste de layout para caber melhor na folha */
+            .phase {
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+            }
+            .task-item {
+                border-bottom: 1px solid #ccc;
+            }
+            .phase-header {
+                background-color: #ddd !important; /* Cinza claro para economizar tinta */
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+            }
+            .phase-num {
+                background-color: #B2D235 !important;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Checklist de Processo Seletivo</h1>
-    
-    <div class="header-fields">
-        <div class="field-group">
-            <label>Nome da Vaga:</label>
-            <input type="text" id="vaga-nome" placeholder="Ex: Analista Comercial">
+    <header>
+        <div class="logo">
+            <img src="1.jpg" alt="Net Turbo">
         </div>
-        <div class="field-group">
-            <label>Data:</label>
-            <input type="date" id="data-processo">
+        <div class="info-inputs">
+            <input type="text" id="vagaInput" placeholder="Nome da Vaga (Ex: SDR Júnior)">
+            <input type="date" id="dataInput">
         </div>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar">0%</div>
     </div>
 
-    <h2>1. Abertura de Vaga</h2>
-    <div class="item"><input type="checkbox" id="check1"><label for="check1">Receber solicitação de vaga aprovada</label></div>
-    <div class="item"><input type="checkbox" id="check2"><label for="check2">Realizar reunião de alinhamento com gestor (Briefing)</label></div>
-    <div class="item"><input type="checkbox" id="check3"><label for="check3">Definir Perfil Comportamental (DISC/Outros)</label></div>
-    <div class="item"><input type="checkbox" id="check4"><label for="check4">Criar job description e validar com gestor</label></div>
+    <form id="checklistForm">
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">1</span> Abertura e Alinhamento</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t1_1"><span class="task-text">Receber abertura via Turbo Desk (Liderança)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t1_2"><span class="task-text">Validar info e Aprovar no Turbo Desk</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t1_3"><span class="task-text">Agendar alinhamento de perfil com Gestor</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t1_4"><span class="task-text">Criar arte da vaga no Canva</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t1_5"><span class="task-text">Formalizar alinhamento por e-mail</span></label></li>
+            </ul>
+        </div>
 
-    <h2>2. Divulgação e Sourcing</h2>
-    <div class="item"><input type="checkbox" id="check5"><label for="check5">Divulgar vaga (LinkedIn, Sites de Vagas, Interno)</label></div>
-    <div class="item"><input type="checkbox" id="check6"><label for="check6">Realizar Hunting ativo (se necessário)</label></div>
-    <div class="item"><input type="checkbox" id="check7"><label for="check7">Triagem de currículos recebidos</label></div>
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">2</span> Atração e Triagem</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t2_1"><span class="task-text">Publicar vaga na Solides</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t2_2"><span class="task-text">Publicar vaga no LinkedIn</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t2_3"><span class="task-text">Cadastrar vaga no ClickUp</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t2_4"><span class="task-text">Triagem de currículos aderentes</span></label></li>
+            </ul>
+        </div>
 
-    <h2>3. Entrevistas e Avaliações</h2>
-    <div class="item"><input type="checkbox" id="check8"><label for="check8">Entrevista de Fit Cultural (RH)</label></div>
-    <div class="item"><input type="checkbox" id="check9"><label for="check9">Aplicar testes técnicos/comportamentais</label></div>
-    <div class="item"><input type="checkbox" id="check10"><label for="check10">Enviar shortlist para o gestor</label></div>
-    <div class="item"><input type="checkbox" id="check11"><label for="check11">Agendar entrevista técnica com gestor</label></div>
-    <div class="item"><input type="checkbox" id="check12"><label for="check12">Coletar feedback do gestor sobre finalistas</label></div>
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">3</span> Avaliação e Testes</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_1"><span class="task-text">Entrevista de triagem com RH</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_2"><span class="task-text">Aplicar testes Solides (Comp./Lógica)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_3"><span class="task-text">Devolutiva negativa (Reprovados Triagem)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_4"><span class="task-text">Realizar pesquisa criminal (Aptos)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_5"><span class="task-text">Agendar entrevista com Liderança</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_6"><span class="task-text">Aplicar teste grafológico</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t3_7"><span class="task-text">Case p/ Diretoria (se Coordenação)</span></label></li>
+            </ul>
+        </div>
 
-    <h2>4. Proposta</h2>
-    <div class="item"><input type="checkbox" id="check13"><label for="check13">Validar condições de contratação (Salário/Benefícios)</label></div>
-    <div class="item"><input type="checkbox" id="check14"><label for="check14">Enviar proposta verbal ao candidato</label></div>
-    <div class="item"><input type="checkbox" id="check15"><label for="check15">Formalizar proposta por e-mail</label></div>
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">4</span> Proposta e Fechamento</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t4_1"><span class="task-text">Receber retorno da Liderança</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t4_2"><span class="task-text">Devolutiva negativa final</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t4_3"><span class="task-text"><strong>CLT:</strong> Enviar Carta Proposta</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t4_4"><span class="task-text"><strong>PJ:</strong> Apresentação proposta (Vídeo)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t4_5"><span class="task-text">Receber aceite formal do candidato</span></label></li>
+            </ul>
+        </div>
 
-    <h2>5. Admissão e Onboarding</h2>
-    
-    <div class="item"><input type="checkbox" id="check16"><label for="check16">Receber aceite do candidato</label></div>
-    <div class="item"><input type="checkbox" id="check17"><label for="check17">Solicitar documentação admissional</label></div>
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">5</span> Admissão e Onboarding</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_1"><span class="task-text">Solicitar documentação admissional</span></label></li>
+                
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="opt_pj" onchange="toggleContract()"><span class="task-text"><strong>Opção:</strong> Contrato PJ</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="opt_clt" onchange="toggleContract()"><span class="task-text"><strong>Opção:</strong> Contrato CLT</span></label></li>
 
-    <div class="item indent-option">
-        <input type="checkbox" id="opt-pj" onchange="toggleContract()">
-        <label for="opt-pj"><strong>O contrato será PJ?</strong></label>
-    </div>
-    
-    <div class="item hidden" id="pj-group-1"><input type="checkbox" id="check-pj1"><label for="check-pj1">PJ: Enviar MEI p/ Fiscal</label></div>
-    <div class="item hidden" id="pj-group-2"><input type="checkbox" id="check-pj2"><label for="check-pj2">Enviar dados para elaboração de contrato p/ DP</label></div>
+                <li class="task-item hidden" id="row_pj_1"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_pj_1"><span class="task-text"><strong>PJ:</strong> Enviar MEI p/ Fiscal</span></label></li>
+                <li class="task-item hidden" id="row_pj_2"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_pj_2"><span class="task-text">Enviar dados para elaboração de contrato p/ DP</span></label></li>
 
-    <div class="item indent-option">
-        <input type="checkbox" id="opt-clt" onchange="toggleContract()">
-        <label for="opt-clt"><strong>O contrato será CLT?</strong></label>
-    </div>
+                <li class="task-item hidden" id="row_clt_1"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_clt_1"><span class="task-text"><strong>CLT:</strong> Agendar exame admissional (SOC)</span></label></li>
 
-    <div class="item hidden" id="clt-group-1"><input type="checkbox" id="check-clt1"><label for="check-clt1">CLT: Agendar exame admissional (SOC)</label></div>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_2"><span class="task-text">Enviar documentos para o DP</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_5"><span class="task-text">E-mail Onboarding (Liderança, T&D, MKT, DP)</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t5_6"><span class="task-text">Chamado Turbo Desk (Endomkt - Kit/Café)</span></label></li>
+            </ul>
+        </div>
 
-    <div class="item"><input type="checkbox" id="check18"><label for="check18">Enviar documentos para o DP</label></div>
-    <div class="item"><input type="checkbox" id="check19"><label for="check19">Agendar integração/Onboarding</label></div>
-    <div class="item"><input type="checkbox" id="check20"><label for="check20">Solicitar equipamentos e acessos (TI)</label></div>
+        <div class="phase">
+            <div class="phase-header"><span class="phase-num">6</span> Encerramento</div>
+            <ul class="task-list">
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t6_1"><span class="task-text">Encerrar vaga na Solides</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t6_2"><span class="task-text">Finalizar tarefa no ClickUp</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t6_3"><span class="task-text">Finalizar chamado no Turbo Desk</span></label></li>
+                <li class="task-item"><label class="task-label"><input type="checkbox" class="task-checkbox" id="t6_4"><span class="task-text">Inserir na Planilha de Vagas (SLA)</span></label></li>
+            </ul>
+        </div>
+    </form>
 
-    <div class="btn-container">
-        <button onclick="window.print()">Salvar PDF / Imprimir</button>
-        <button class="clear-btn" onclick="clearAll()">Limpar Tudo</button>
+    <div class="actions">
+        <button class="btn btn-print" onclick="window.print()">🖨️ Salvar em PDF</button>
+        <button class="btn btn-reset" onclick="resetChecklist()">🗑️ Limpar</button>
     </div>
 </div>
 
 <script>
-    // Função específica para a lógica do Item 5
-    function toggleContract() {
-        const isPJ = document.getElementById('opt-pj').checked;
-        const isCLT = document.getElementById('opt-clt').checked;
+    // Seleciona todos os inputs
+    const checkboxes = document.querySelectorAll('.task-checkbox');
+    const progressBar = document.getElementById('progressBar');
+    const vagaInput = document.getElementById('vagaInput');
+    const dataInput = document.getElementById('dataInput');
 
-        const pjRow1 = document.getElementById('pj-group-1');
-        const pjRow2 = document.getElementById('pj-group-2');
-        const cltRow1 = document.getElementById('clt-group-1');
+    // Carregar dados salvos ao abrir
+    window.addEventListener('load', () => {
+        loadData();
+        toggleContract(); // Garante que a visibilidade correta seja aplicada ao carregar
+        updateProgress();
+    });
+
+    // Salvar dados a cada mudança
+    checkboxes.forEach(box => {
+        box.addEventListener('change', () => {
+            saveData();
+            updateProgress();
+        });
+    });
+
+    vagaInput.addEventListener('input', saveData);
+    dataInput.addEventListener('input', saveData);
+
+    // FUNÇÃO NOVA: Controla visibilidade PJ/CLT
+    function toggleContract() {
+        const pjChecked = document.getElementById('opt_pj').checked;
+        const cltChecked = document.getElementById('opt_clt').checked;
+
+        const pjRow1 = document.getElementById('row_pj_1');
+        const pjRow2 = document.getElementById('row_pj_2');
+        const cltRow1 = document.getElementById('row_clt_1');
 
         // Lógica PJ
-        if (isPJ) {
+        if(pjChecked) {
             pjRow1.classList.remove('hidden');
             pjRow2.classList.remove('hidden');
         } else {
             pjRow1.classList.add('hidden');
             pjRow2.classList.add('hidden');
+            // Opcional: desmarcar se esconder (comentei para manter estado se reabrir)
+            // document.getElementById('t5_pj_1').checked = false;
+            // document.getElementById('t5_pj_2').checked = false;
         }
 
         // Lógica CLT
-        if (isCLT) {
+        if(cltChecked) {
             cltRow1.classList.remove('hidden');
         } else {
             cltRow1.classList.add('hidden');
+            // document.getElementById('t5_clt_1').checked = false;
+        }
+        
+        // Atualiza progresso pois o número de itens visíveis mudou
+        updateProgress();
+    }
+
+    function updateProgress() {
+        // Conta apenas checkboxes que estão visíveis (o pai não tem a classe hidden)
+        // Array.from converte NodeList para Array para usar filter
+        const visibleCheckboxes = Array.from(checkboxes).filter(box => {
+            // Verifica se o item pai (li) tem a classe hidden
+            return !box.closest('li').classList.contains('hidden');
+        });
+
+        const total = visibleCheckboxes.length;
+        const checked = visibleCheckboxes.filter(box => box.checked).length;
+        
+        // Evita divisão por zero
+        const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
+        
+        progressBar.style.width = percent + '%';
+        progressBar.textContent = percent + '% Concluído';
+        
+        if(percent === 100) {
+            progressBar.style.backgroundColor = '#28a745';
+            progressBar.style.color = 'white';
+        } else {
+            progressBar.style.backgroundColor = '#B2D235';
+            progressBar.style.color = '#4a4a4a';
         }
     }
 
-    // Scripts para salvar o estado dos checkboxes (LocalStorage)
-    const inputs = document.querySelectorAll('input');
-    
-    function saveState() {
-        inputs.forEach(input => {
-            if(input.type === 'checkbox') {
-                localStorage.setItem(input.id, input.checked);
-            } else {
-                localStorage.setItem(input.id, input.value);
-            }
+    function saveData() {
+        const checkboxStates = {};
+        checkboxes.forEach(box => {
+            checkboxStates[box.id] = box.checked;
         });
+        localStorage.setItem('netTurbo_checkboxes', JSON.stringify(checkboxStates));
+        localStorage.setItem('netTurbo_vaga', vagaInput.value);
+        localStorage.setItem('netTurbo_data', dataInput.value);
     }
 
-    function loadState() {
-        inputs.forEach(input => {
-            const saved = localStorage.getItem(input.id);
-            if (saved !== null) {
-                if(input.type === 'checkbox') {
-                    input.checked = (saved === 'true');
-                } else {
-                    input.value = saved;
+    function loadData() {
+        const savedStates = JSON.parse(localStorage.getItem('netTurbo_checkboxes'));
+        if (savedStates) {
+            checkboxes.forEach(box => {
+                if (savedStates[box.id]) {
+                    box.checked = true;
                 }
-            }
-        });
-        // Roda a verificação de visibilidade ao carregar
-        toggleContract();
+            });
+        }
+        const savedVaga = localStorage.getItem('netTurbo_vaga');
+        const savedData = localStorage.getItem('netTurbo_data');
+        
+        if (savedVaga) vagaInput.value = savedVaga;
+        if (savedData) dataInput.value = savedData;
     }
 
-    inputs.forEach(input => {
-        input.addEventListener('change', saveState);
-    });
-
-    function clearAll() {
-        if(confirm('Deseja limpar todos os dados?')) {
-            localStorage.clear();
-            location.reload();
+    function resetChecklist() {
+        if(confirm("Tem certeza que deseja limpar tudo para iniciar um novo processo?")) {
+            localStorage.removeItem('netTurbo_checkboxes');
+            localStorage.removeItem('netTurbo_vaga');
+            localStorage.removeItem('netTurbo_data');
+            location.reload(); 
         }
     }
-
-    // Carrega ao iniciar
-    loadState();
 </script>
 
 </body>
